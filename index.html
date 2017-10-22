@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Searchers of the Unknown / Torchbearer Character Generator</title>
+ </head>
+ <body>
+  <h2 id='name' onclick='printCharacter(new character())'></h2>
+  <p id='descript' style='width:250px'></p>
+  <pre id='stats'></pre>
+<script>
+
+printCharacter(new character());
+
+function character()
+{
+  this.name = getFullName();
+  this.descript = getDescript();
+  this.AC = roll(1, 3) + 7;
+  this.MV = roll(1, 3) + 4;
+  this.LV = 1;
+  this.HP = roll(this.LV, 8);
+  this.AT = Math.floor(this.LV / 5) + 1;
+  this.D = getItem(['1d3', '1d4', '1d6']);
+}
+
+
+
+
+
+function printCharacter(joe)
+{
+  document.getElementById('name').innerHTML = joe.name;
+  document.getElementById('stats').innerHTML = 
+    'AC ' + joe.AC + '  MV ' + joe.MV + '  lvl ' + joe.LV + 
+    '  hp ' + joe.HP + '  #AT ' + joe.AT + '  D ' + joe.D;
+  document.getElementById('descript').innerHTML = joe.descript;
+}
+
+
+
+
+
+function roll(a, b)
+{
+  var c = (Math.floor(Math.random() * b) + 1);
+  if (a === 1) return c;
+  return c + roll(a - 1, b);
+}
+
+
+
+
+
+function getItem(list)
+{
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+
+
+
+
+function getFullName()
+{
+  if (roll(1, 3) > 1) return getName() + ' ' + getName();
+  return getName() + getMedial() + getName();
+}
+
+
+
+
+
+function getName()
+{
+  return getItem([getCompleteName(), getPre() + getSuf()]);
+}
+
+function getCompleteName()
+{
+  return getItem(['Aberdeen', 'Abraham', 'Agnes', 'Albatross', 'Antelope',  'Apache', 'Arkansas', 'Artichoke', 'Baltimore', 'Banjo', 'Barneby', 'Buffalo', 'Billy', 'Bob', 'Burgess', 'Cactus', 'Canterbury', 'Caribou', 'Charles', 'Cherokee', 'Chickasaw', 'Chocksaw', 'Cockatoo', 'Conan', 'Cusco', 'Denver', 'Dorris', 'Duncan', 'Durango', 'Eskimo', 'Fandango', 'Finnegan', 'Foothills', 'Fox', 'Francois', 'Geronimo', 'Goose', 'Guadeloupe', 'Hambone', 'Hamilton', 'Hickory', 'Hidalgo', 'Hurricane', 'Idaho', 'Iroquois', 'Irving', 'Jack', 'Jaguar', 'Jane', 'Jebediah', 'Jezebel', 'Jim', 'Jimmy', 'Joe', 'Jones', 'John', 'Johnny', 'Johnson', 'Kenesaw', 'Labrador', 'Lafayette', 'Lehigh', 'Manitoba', 'Marquis', 'Marrakesh', 'McCarthy', 'McCormick', 'Monroe', 'Montezuma', 'Morocco', 'Moses', 'Mountain', 'Mississippi', 'Muhammad', 'Mulligan', 'Obadiah', 'Orlando', 'Panama', 'Patrick', 'Peabody', 'Pumpernickel', 'Ramadan', 'Rococo', 'Santiago', 'Sausage', 'Scarborough', 'Sequoia', 'Sonora', 'Stan', 'Stornoway', 'Sycamore', 'Tangerine', 'Tennessee', 'Theodore', 'Toboggan', 'Tomahawk', 'Toronto', 'Tuckahoe', 'Tucan', 'Tucker', 'Victoria', 'Wallace', 'Warren', 'Winnipeg', 'Yucatan', 'Yukon', 'Zelda', 'Ziggy']);
+}
+
+function getPre()
+{
+  return getItem(['Apple', 'Black', 'Broad', 'Bumble', 'Bungle', 'Button', 'Chamber', 'Clamber', 'Copper', 'Cold', 'Corn', 'Crumble', 'Deep', 'Ember', 'Ever', 'Feather', 'Fight', 'Fountain', 'Hammer', 'Hard', 'Hog', 'Horn', 'Humble', 'Iron', 'Jingle', 'Jumble', 'Jump', 'Jungle', 'Gold', 'Golden', 'Good', 'Grumble', 'Long', 'Low', 'Metal', 'Moose', 'Mountain', 'Mouse', 'Mud', 'Night', 'Rumple', 'Power', 'Punch', 'Salty', 'Sandle', 'Scarlet', 'Shackle', 'Small', 'Strong', 'Tender', 'Thorn', 'Thunder', 'Tug', 'Tumble', 'Tough', 'Under', 'Yellow', 'Wooden']);
+}
+
+function getSuf()
+{
+  return getItem(['bag', 'bags', 'bake', 'bank', 'basket', 'berries', 'berry', 'bin', 'bird', 'bolt', 'bone', 'bones', 'booth', 'boots', 'bottom', 'brains', 'breath', 'brick', 'bridge', 'buckle', 'buckles', 'buns', 'burger', 'cap', 'castle', 'choke', 'crack', 'cracker', 'crumbs', 'darling', 'fever', 'field', 'finger', 'fingers', 'foal', 'fold', 'foot', 'green', 'grills', 'ham', 'hat', 'hood', 'horn', 'juice', 'law', 'love', 'machine', 'more', 'mouth', 'park', 'parker', 'paw', 'pickle', 'poke', 'puddle', 'seed', 'shade', 'shoes', 'shot', 'shoot', 'smith', 'snout', 'socks', 'stone', 'tack', 'tackle', 'tickets', 'toe', 'toes', 'tubes', 'weed', 'well']);
+}
+
+function getMedial()
+{
+  return getItem([' von ', ' Mc', ' St. ', ' ' + getName() + ' ', ' ' + getName() + '-', ' \"' + getName() + '\" ']);
+}
+
+
+
+
+
+function getDescript()
+{
+  return (getItem([getOccupation() + ', ']) + 
+          getItem(['', '', getHair() + ', ']) + 
+          getItem(['', '', getFace() + ', ']) + 
+          getItem(['', '', getBody() + ', ']) + 
+          getItem(['', '', getAccessory() + ', ']) + 
+          getItem(['', '', getTrait() + ', ']) + 
+          getItem(['', '', getPassion() + ', ']) + 
+          getItem(['', '', getIrritation() + ', ']) + 
+          getItem(['', '', getMotivation() + ', ']) + 
+          getItem(['', '', getHobby() + ', ']) + 
+          getItem(['', getSkill() + ', '])).slice(0, -2);
+}
+
+
+
+
+
+function getOccupation()
+{
+  return getItem(['alchemist', 'animal trainer', 'armorer', 'astrologer', 'blacksmith', 'caravan guard', 'cobbler', 'confidence artist', 'cooper', 'caturse', 'ditch digger', 'dwarven blacksmith', 'dwarven herder', 'dwarven miner', 'elven artisan', 'elven forester', 'elven sage', 'farmer', 'fortune-teller', 'gambler', 'gongfarmer', 'grave digger', 'guild beggar', 'halfling trader', 'halfling vagabond', 'halfling vagrant', 'healer', 'herbalist', 'herder', 'hunter', 'indentured servant', 'jester', 'jeweler', 'locksmith', 'mercenary', 'miller', 'baker', 'minstrel', 'noble', 'orphan', 'ostler', 'outlaw', 'scribe', 'shaman', 'slave', 'smuggler', 'soldier', 'squire', 'trapper', 'urchin', 'wainwright', 'weaver', 'wizard\'s apprentice', 'woodcutter']);
+}
+
+
+
+
+function getHair()
+{
+  return getItem(['', '', 'curly', 'long', 'short']) + ' ' + getItem(['black', 'blond', 'brown', 'red']) + ' hair';
+}
+
+
+
+
+function getFace()
+{
+  return getItem(['blue eyes', 'enormous moustache', 'large nose', 'pale', 'small nose', 'tan', 'thick beard', 'yellow eyes']);
+}
+
+
+
+
+function getBody()
+{
+  return getItem(['elderly', 'muscular', 'short', 'stout', 'tall', 'youthful']);
+}
+
+
+
+
+function getAccessory()
+{
+  return getItem(['uses a walking stick', 'wears a flower garland', 'wears a headscarf', 'wears a pointy hat', 'wears a turban', 'wears sandals']);
+}
+
+
+
+
+function getTrait()
+{
+  return getItem(['accommodating', 'aggressive', 'ambitious', 'annoying', 'awkward', 'brave', 'calm', 'charming', 'clean', 'cold', 'complacent', 'creative', 'crude', 'cynical', 'daring', 'depressed', 'doubtful', 'eccentric', 'flirty', 'funny', 'graceful', 'honest', 'impulsive', 'independent', 'insecure', 'lazy', 'loving', 'loyal', 'musical', 'naive', 'nosy', 'optimistic', 'outspoken', 'pessimistic', 'pious', 'proud', 'quiet', 'sleazy', 'superstitious', 'sweet', 'vindictive', 'worldly']);
+}
+
+
+
+
+function getPassion()
+{
+  return getItem(['enjoys complaining', 'enjoys cruelty', 'enjoys fancy parties', 'enjoys flattery', 'enjoys loud parties', 'enjoys obscure facts', 'enjoys the little things', 'loves small animals']);
+}
+
+
+
+
+function getIrritation()
+{
+  return getItem(['annoyed by ', 'disgusted by ', 'put off by ']) + getItem(['bureaucracy', 'complaining', 'cruelty', 'fancy parties', 'foolish bravery', 'flattery', 'obscure facts', 'loud parties', 'small animals', 'vagabonds', 'zealots']);
+}
+
+
+
+
+function getMotivation()
+{
+  return getItem(['driven by curiosity', 'driven by hate', 'fights for honor', 'hungry for power', 'seeks true love', 'strives for justice']);
+}
+
+
+
+
+function getHobby()
+{
+  return getItem(['cooks', 'dances', 'drinks in excess', 'gambles', 'plays the ' + getItem(['fiddle', 'flute', 'lute']), 'sings', 'writes poetry']);
+}
+
+
+
+
+
+function getSkill()
+{
+  return getItem(['ear for languages', 'good with animals', 'can speak with ' + getItem(['creatures of the forest', 'dragonkin', 'goblinoids', 'the undead']), 'silver tongue']);
+}
+
+
+
+</script>
+ </body>
+</html>
