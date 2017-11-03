@@ -3,10 +3,87 @@
  <head>
   <title>Searchers of the Unknown / Torchbearer Character Generator</title>
  </head>
- <body>
-  <h2 id='name' onclick='printCharacter(new character())'></h2>
-  <p id='descript' style='width:250px'></p>
-  <pre id='stats'></pre>
+ <body id='backcolor' style='width:95%' onclick='printCharacter(new character())'>
+  <h2 style='text-align:center' id='name' ></h2>
+  <h3 style='text-align:center' id='title'></h3>
+  <h3 style='text-align:center' id='hits'></h3>
+  <h3>
+   <table style='margin: 0px auto; border: 2px solid black'>
+    <tr>
+     <td>HP:</td>
+     <td id='hp'></td>
+     <td>~</td>
+     <td>AC:</td>
+     <td id='ac'></td>
+    </tr>
+   </table>
+  </h3>
+
+  <table style='border: 2px solid black; height: 100%; margin: 0px auto'>
+   <tr>
+    <td>
+     <table style='border: 2px solid black'>
+      <tr>
+       <td style='text-align:right'>STR:</td>
+       <td id='str' style='text-align:center'></td>
+       <td id='strmods' style='text-align:center'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>DEX:</td>
+       <td id='dex' style='text-align:center'></td>
+       <td id='dexmods' style='text-align:center'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>CON:</td>
+       <td id='con' style='text-align:center'></td>
+       <td id='conmods' style='text-align:center'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>INT:</td>
+       <td id='int' style='text-align:center'></td>
+       <td id='intmods' style='text-align:center'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>WIS:</td>
+       <td id='wis' style='text-align:center'></td>
+       <td id='wismods' style='text-align:center'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>CHA:</td>
+       <td id='cha' style='text-align:center'></td>
+       <td id='chamods' style='text-align:center'></td>
+      </tr>
+     </table>
+    </td>
+    <td>
+     <table style='border: 2px solid black; height:100%'>
+      <tr>
+       <td style='text-align:right'>Breath Attacks:</td>
+       <td id='breath'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>Poison or Death:</td>
+       <td id='poison'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>Petrify or Paralyze:</td>
+       <td id='petrify'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>Wands:</td>
+       <td id='wands'></td>
+      </tr>
+      <tr>
+       <td style='text-align:right'>Spells:</td>
+       <td id='spells'></td>
+      </tr>
+     </table>
+    </td>
+   </tr>
+  </table>
+
+  <h3 style='text-align:center' id='languages'></h3>
+
 <script>
 
 printCharacter(new character());
@@ -14,13 +91,23 @@ printCharacter(new character());
 function character()
 {
   this.name = getFullName();
+  this.stats =
+  [
+    roll(3, 6),
+    roll(3, 6),
+    roll(3, 6),
+    roll(3, 6),
+    roll(3, 6),
+    roll(3, 6)
+  ];
+  this.class = getClass(this.stats);
+  this.mods = getMods(this.stats, this.class);
+  this.HP = getHP(this.class, parseInt(this.mods[4]));
+  this.AC = 9 + parseInt(this.mods[1]);
+  this.saves = getSaves(this.class);
+  this.alignment = getItem(['Lawful', 'Neutral', 'Chaotic']);
+  this.languages = getLanguages(this.stats[3], this.class);
   this.descript = getDescript();
-  this.AC = roll(1, 3) + 7;
-  this.MV = roll(1, 3) + 4;
-  this.LV = 1;
-  this.HP = roll(this.LV, 8);
-  this.AT = Math.floor(this.LV / 5) + 1;
-  this.D = getItem(['1d3', '1d4', '1d6']);
 }
 
 
@@ -29,11 +116,61 @@ function character()
 
 function printCharacter(joe)
 {
+  document.getElementById('backcolor').style.backgroundColor = getColor(joe.class);
   document.getElementById('name').innerHTML = joe.name;
-  document.getElementById('stats').innerHTML = 
-    'AC ' + joe.AC + '  MV ' + joe.MV + '  lvl ' + joe.LV + 
-    '  hp ' + joe.HP + '  #AT ' + joe.AT + '  D ' + joe.D;
-  document.getElementById('descript').innerHTML = joe.descript;
+  document.getElementById('title').innerHTML =
+    joe.alignment + ' ' + joe.class;
+  document.getElementById('str').innerHTML = joe.stats[0];
+  document.getElementById('dex').innerHTML = joe.stats[1];
+  document.getElementById('con').innerHTML = joe.stats[2];
+  document.getElementById('int').innerHTML = joe.stats[3];
+  document.getElementById('wis').innerHTML = joe.stats[4];
+  document.getElementById('cha').innerHTML = joe.stats[5];
+  document.getElementById('strmods').innerHTML = 
+    '(' + joe.mods[0] + ')';
+  document.getElementById('dexmods').innerHTML = 
+    '(' + joe.mods[1] + '/' + joe.mods[2] + '/' + joe.mods[3] + ')';
+  document.getElementById('conmods').innerHTML = 
+    '(' + joe.mods[4] + ')';
+  document.getElementById('intmods').innerHTML = 
+    '(' + joe.mods[5] + ')';
+  document.getElementById('wismods').innerHTML = 
+    '(' + joe.mods[6] + ')';
+  document.getElementById('chamods').innerHTML = 
+    '(' + joe.mods[7] + '/' + joe.mods[8] + '/' + joe.mods[9] + ')';
+  document.getElementById('hp').innerHTML = joe.HP;
+  document.getElementById('ac').innerHTML = joe.AC;
+  document.getElementById('breath').innerHTML = joe.saves[0];
+  document.getElementById('poison').innerHTML = joe.saves[1];
+  document.getElementById('petrify').innerHTML = joe.saves[2];
+  document.getElementById('wands').innerHTML = joe.saves[3];
+  document.getElementById('spells').innerHTML = joe.saves[4];
+  document.getElementById('languages').innerHTML = joe.languages;
+}
+
+
+
+
+
+function getColor(charClass)
+{
+  switch (charClass)
+  {
+    case 'Cleric':
+      return 'PowderBlue';
+    case 'Dwarf':
+      return 'Tan';
+    case 'Halfling':
+      return 'Thistle';
+    case 'Elf':
+      return 'LightGreen';
+    case 'Fighter':
+      return 'Cornsilk';
+    case 'Magic User':
+      return 'Pink';
+    case 'Thief':
+      return 'Silver';
+  }
 }
 
 
@@ -45,6 +182,393 @@ function roll(a, b)
   var c = (Math.floor(Math.random() * b) + 1);
   if (a === 1) return c;
   return c + roll(a - 1, b);
+}
+
+
+
+
+
+function getClass(a)
+{
+  var qualify = [];
+  if (a[4] >= 16) qualify.push('Cleric');
+  if (a[0] >= 16 && a[2] >= 9) qualify.push('Dwarf');
+  if (a[0] >= 13 && a[3] >= 16) qualify.push('Elf');
+  if (a[0] >= 16) qualify.push('Fighter');
+  if (a[0] >= 13 && a[1] >= 13 && a[2] >= 9) qualify.push('Halfling');
+  if (a[3] >= 16) qualify.push('Magic User');
+  if (a[1] >= 16) qualify.push('Thief');
+  if (qualify.length > 0) return getItem(qualify);
+
+  if (a[4] >= 13) qualify.push('Cleric');
+  if (a[0] >= 13 && a[2] >= 9) qualify.push('Dwarf');
+  if (a[0] >= 13 && a[3] >= 13) qualify.push('Elf');
+  if (a[0] >= 13) qualify.push('Fighter');
+  if ((a[0] >= 13 || a[1] >= 13) && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
+  if (a[3] >= 13) qualify.push('Magic User');
+  if (a[1] >= 13) qualify.push('Thief');
+  if (qualify.length > 0) return getItem(qualify);
+
+  if (a[4] >= 9) qualify.push('Cleric');
+  if (a[0] >= 9 && a[2] >= 9) qualify.push('Dwarf');
+  if (a[0] >= 9 && a[3] >= 9) qualify.push('Elf');
+  if (a[0] >= 9) qualify.push('Fighter');
+  if (a[0] >= 9 && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
+  if (a[3] >= 9) qualify.push('Magic User');
+  if (a[1] >= 9) qualify.push('Thief');
+  if (qualify.length > 0) return getItem(qualify);
+
+  if (a[4] >= 6) qualify.push('Cleric');
+  if (a[0] >= 6 && a[2] >= 9) qualify.push('Dwarf');
+  if (a[0] >= 6 && a[3] >= 9) qualify.push('Elf');
+  if (a[0] >= 6) qualify.push('Fighter');
+  if (a[0] >= 6 && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
+  if (a[3] >= 6) qualify.push('Magic User');
+  if (a[1] >= 6) qualify.push('Thief');
+  if (qualify.length > 0) return getItem(qualify);
+
+  qualify.push('Cleric');
+  if (a[2] >= 9) qualify.push('Dwarf');
+  if (a[3] >= 9) qualify.push('Elf');
+  qualify.push('Fighter');
+  if (a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
+  qualify.push('Magic User');
+  qualify.push('Thief');
+  return getItem(qualify);
+}
+
+
+
+
+function getMods(stats, charClass)
+{
+  var mods = [];
+  switch (stats[0])
+  {
+    case 3:
+      mods.push('-3'); break;
+    case 4: case 5:
+      mods.push('-2'); break;
+    case 6: case 7: case 8:
+      mods.push('-1'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); break;
+    case 13: case 14: case 15:
+      mods.push('+1'); break;
+    case 16: case 17:
+      mods.push('+2'); break;
+    case 18:
+      mods.push('+3'); break;
+  }
+  switch (stats[1])
+  {
+    case 3:
+      mods.push('+3'); mods.push('-3'); mods.push('-2'); break;
+    case 4: case 5:
+      mods.push('+2'); mods.push('-2'); mods.push('-1'); break;
+    case 6: case 7: case 8:
+      mods.push('+1'); mods.push('-1'); mods.push('-1'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); mods.push('0'); mods.push('0'); break;
+    case 13: case 14: case 15:
+      mods.push('-1'); mods.push('+1'); mods.push('+1'); break;
+    case 16: case 17:
+      mods.push('-2'); mods.push('+2'); mods.push('+1'); break;
+    case 18:
+      mods.push('-3'); mods.push('+3'); mods.push('+2'); break;
+  }
+  switch (stats[2])
+  {
+    case 3:
+      mods.push('-3'); break;
+    case 4: case 5:
+      mods.push('-2'); break;
+    case 6: case 7: case 8:
+      mods.push('-1'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); break;
+    case 13: case 14: case 15:
+      mods.push('+1'); break;
+    case 16: case 17:
+      mods.push('+2'); break;
+    case 18:
+      mods.push('+3'); break;
+  }
+  switch (stats[3])
+  {
+    case 3:
+      mods.push('0'); break;
+    case 4: case 5:
+      mods.push('0'); break;
+    case 6: case 7: case 8:
+      mods.push('0'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); break;
+    case 13: case 14: case 15:
+      mods.push('+1'); break;
+    case 16: case 17:
+      mods.push('+2'); break;
+    case 18:
+      mods.push('+3'); break;
+  }
+  switch (stats[4])
+  {
+    case 3:
+      mods.push('-3'); break;
+    case 4: case 5:
+      mods.push('-2'); break;
+    case 6: case 7: case 8:
+      mods.push('-1'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); break;
+    case 13: case 14: case 15:
+      mods.push('+1'); break;
+    case 16: case 17:
+      mods.push('+2'); break;
+    case 18:
+      mods.push('+3'); break;
+  }
+  switch (stats[5])
+  {
+    case 3:
+      mods.push('+2'); mods.push('1'); mods.push('4'); break;
+    case 4: case 5:
+      mods.push('+1'); mods.push('2'); mods.push('5'); break;
+    case 6: case 7: case 8:
+      mods.push('+1'); mods.push('3'); mods.push('6'); break;
+    case 9: case 10: case 11: case 12:
+      mods.push('0'); mods.push('4'); mods.push('7'); break;
+    case 13: case 14: case 15:
+      mods.push('-1'); mods.push('5'); mods.push('8'); break;
+    case 16: case 17:
+      mods.push('-1'); mods.push('6'); mods.push('9'); break;
+    case 18:
+      mods.push('-3'); mods.push('7'); mods.push('10'); break;
+  }
+  return mods;
+}
+
+
+
+
+
+function getHP(charClass, hp)
+{
+  switch (charClass)
+  {
+    case 'Magic User': case 'Thief':
+      hp += roll(1, 4); break;
+    case 'Cleric': case 'Elf': case 'Halfling':
+      hp += roll(1, 6); break;
+    case 'Dwarf': case 'Fighter':
+      hp += roll(1, 8);
+  }
+  if (hp < 1) hp = 1;
+  return hp;
+}
+
+
+
+
+
+function getSaves(charClass)
+{
+  switch (charClass)
+  {
+    case 'Cleric':
+      return [16, 11, 14, 12, 15];
+    case 'Dwarf': case 'Halfling':
+      return [13, 8, 10, 9, 12];
+    case 'Elf':
+      return [15, 12, 13, 13, 15];
+    case 'Fighter':
+      return [17, 14, 16, 15, 18];
+    case 'Magic User':
+      return [16, 13, 13, 13, 14];
+    case 'Thief':
+      return [16, 14, 13, 15, 14];
+  }
+}
+
+
+
+
+
+function getLanguages(int, charClass)
+{
+  switch (int)
+  {
+    case 3:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Broken Common, Illiterate';
+        case 'Dwarf':
+          return 'Speaks Broken Common and Dwarvish, Illiterate';
+        case 'Elf':
+          return 'Speaks Broken Common and Elvish, Illiterate';
+        case 'Halfling':
+          return 'Speaks Broken Common and Halfling, Illiterate';
+      }
+    case 4: case 5:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common, Illiterate';
+        case 'Dwarf':
+          return 'Speaks Common and Dwarvish, Illiterate';
+        case 'Elf':
+          return 'Speaks Common and Elvish, Illiterate';
+        case 'Halfling':
+          return 'Speaks Common and Halfling, Illiterate';
+      }
+    case 6: case 7: case 8:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common, Somewhat Literate';
+        case 'Dwarf':
+          return 'Speaks Common and Dwarvish, Somewhat Literate';
+        case 'Elf':
+          return 'Speaks Common and Elvish, Somewhat Literate';
+        case 'Halfling':
+          return 'Speaks Common and Halfling, Somewhat Literate';
+      }
+    case 9: case 10: case 11: case 12:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common';
+        case 'Dwarf':
+          return 'Speaks Common and Dwarvish';
+        case 'Elf':
+          return 'Speaks Common and Elvish';
+        case 'Halfling':
+          return 'Speaks Common and Halfling';
+      }
+    case 13: case 14: case 15:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common and ' + pickLang(1, charClass);
+        case 'Dwarf':
+          return 'Speaks Common, Dwarvish and ' + pickLang(1, charClass);
+        case 'Elf':
+          return 'Speaks Common, Elvish and ' + pickLang(1, charClass);
+        case 'Halfling':
+          return 'Speaks Common, Halfling and ' + pickLang(1, charClass);
+      }
+    case 16: case 17:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common, ' + pickLang(2, charClass);
+        case 'Dwarf':
+          return 'Speaks Common, Dwarvish, ' + pickLang(2, charClass);
+        case 'Elf':
+          return 'Speaks Common, Elvish, ' + pickLang(2, charClass);
+        case 'Halfling':
+          return 'Speaks Common, Halfling, ' + pickLang(2, charClass);
+      }
+    case 18:
+      switch (charClass)
+      {
+        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+          return 'Speaks Common, ' + pickLang(3, charClass);
+        case 'Dwarf':
+          return 'Speaks Common, Dwarvish, ' + pickLang(3, charClass);
+        case 'Elf':
+          return 'Speaks Common, Elvish, ' + pickLang(3, charClass);
+        case 'Halfling':
+          return 'Speaks Common, Halfling, ' + pickLang(3, charClass);
+      }
+  }
+}
+
+
+
+
+
+function pickLang(num, charClass)
+{
+  var a = [0, 0, 0];
+  while (a[0] === a[1] || a[0] === a[2] || a[1] === a[2])
+  {
+    for (var i = 0; i < 3; i++)
+    {
+      switch (charClass)
+      {
+        case 'Cleric':
+          a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 11, 12]); break;
+        case 'Dwarf':
+          a[i] = getItem([2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 6, 7, 7, 7, 8, 12, 12, 14, 15, 15, 15]); break;
+        case 'Elf':
+          a[i] = getItem([1, 1, 1, 3, 3, 3, 4, 4, 4, 5, 6, 7, 8, 11, 11, 11, 11, 12, 14, 16, 18]); break;
+        case 'Fighter':
+          a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7, 8, 12]); break;
+        case 'Halfling':
+          a[i] = getItem([1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 6, 7, 8, 11, 11, 12, 13, 14, 18]); break;
+        case 'Magic User':
+          a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 7, 7, 7, 8, 9, 9, 9, 10, 10, 10, 11, 12, 14, 15, 16, 17, 18, 19, 19]); break;
+        case 'Thief':
+          a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7, 8, 11, 12, 15, 19]);
+      }
+    }
+  }
+  //a.sort(function(a, b){return a - b});
+  for (var i = 0; i < 3; i++)
+  {
+    switch (a[i])
+    {
+      case 1:
+        a[i] = 'Dwarvish'; break;
+      case 2:
+        a[i] = 'Elvish'; break;
+      case 3:
+        a[i] = 'Halfling'; break;
+      case 4:
+        a[i] = 'Gnomish'; break;
+      case 5:
+        a[i] = 'Goblin'; break;
+      case 6:
+        a[i] = 'Gnoll'; break;
+      case 7:
+        a[i] = 'Draconic'; break;
+      case 8:
+        a[i] = 'Orc'; break;
+      case 9:
+        a[i] = 'Angelic'; break;
+      case 10:
+        a[i] = 'Demonic'; break;
+      case 11:
+        a[i] = 'Fairy'; break;
+      case 12:
+        a[i] = 'Giant'; break;
+      case 13:
+        a[i] = 'Bear'; break;
+      case 14:
+        a[i] = 'Eagle'; break;
+      case 15:
+        a[i] = 'Raven'; break;
+      case 16:
+        a[i] = 'Wolf'; break;
+      case 17:
+        a[i] = 'Ape'; break;
+      case 18:
+        a[i] = 'Fish'; break;
+      case 19:
+        a[i] = 'Spider';
+    }
+  }
+  switch (num)
+  {
+    case 1:
+      return a[0];
+    case 2:
+      return a[0] + ' and ' + a[1];
+    case 3:
+      return a[0] + ', ' + a[1] + ' and ' + a[2];
+  }
 }
 
 
@@ -77,17 +601,17 @@ function getName()
 
 function getCompleteName()
 {
-  return getItem(['Aberdeen', 'Abraham', 'Agnes', 'Albatross', 'Antelope',  'Apache', 'Arkansas', 'Artichoke', 'Baltimore', 'Banjo', 'Barneby', 'Buffalo', 'Billy', 'Bob', 'Burgess', 'Cactus', 'Canterbury', 'Caribou', 'Charles', 'Cherokee', 'Chickasaw', 'Chocksaw', 'Cockatoo', 'Conan', 'Cusco', 'Denver', 'Dorris', 'Duncan', 'Durango', 'Eskimo', 'Fandango', 'Finnegan', 'Foothills', 'Fox', 'Francois', 'Geronimo', 'Goose', 'Guadeloupe', 'Hambone', 'Hamilton', 'Hickory', 'Hidalgo', 'Hurricane', 'Idaho', 'Iroquois', 'Irving', 'Jack', 'Jaguar', 'Jane', 'Jebediah', 'Jezebel', 'Jim', 'Jimmy', 'Joe', 'Jones', 'John', 'Johnny', 'Johnson', 'Kenesaw', 'Labrador', 'Lafayette', 'Lehigh', 'Manitoba', 'Marquis', 'Marrakesh', 'McCarthy', 'McCormick', 'Monroe', 'Montezuma', 'Morocco', 'Moses', 'Mountain', 'Mississippi', 'Muhammad', 'Mulligan', 'Obadiah', 'Orlando', 'Panama', 'Patrick', 'Peabody', 'Pumpernickel', 'Ramadan', 'Rococo', 'Santiago', 'Sausage', 'Scarborough', 'Sequoia', 'Sonora', 'Stan', 'Stornoway', 'Sycamore', 'Tangerine', 'Tennessee', 'Theodore', 'Toboggan', 'Tomahawk', 'Toronto', 'Tuckahoe', 'Tucan', 'Tucker', 'Victoria', 'Wallace', 'Warren', 'Winnipeg', 'Yucatan', 'Yukon', 'Zelda', 'Ziggy']);
+  return getItem(['Aberdeen', 'Abraham', 'Agnes', 'Albatross', 'Antelope',  'Apache', 'Arkansas', 'Artichoke', 'Baltimore', 'Banjo', 'Barneby', 'Buffalo', 'Billy', 'Bob', 'Burgess', 'Cactus', 'Canterbury', 'Caribou', 'Charles', 'Cherokee', 'Chickasaw', 'Chocksaw', 'Cockatoo', 'Conan', 'Cusco', 'Denver', 'Dorris', 'Duncan', 'Durango', 'Eskimo', 'Fandango', 'Finnegan', 'Foothills', 'Fox', 'Francois', 'Geronimo', 'Goose', 'Guadeloupe', 'Hambone', 'Hamilton', 'Hickory', 'Hidalgo', 'Hurricane', 'Idaho', 'Iroquois', 'Irving', 'Jack', 'Jaguar', 'Jane', 'Jebediah', 'Jezebel', 'Jim', 'Jimmy', 'Joe', 'Jones', 'John', 'Johnny', 'Johnson', 'Kenesaw', 'Labrador', 'Lafayette', 'Lehigh', 'Manitoba', 'Marquis', 'Marrakesh', 'McCarthy', 'McCormick', 'Monroe', 'Montezuma', 'Morocco', 'Moses', 'Mountain', 'Mississippi', 'Muhammad', 'Mulligan', 'Obadiah', 'Orlando', 'Panama', 'Patrick', 'Peabody', 'Pumpernickel', 'Ramadan', 'Rococo', 'Sandwich', 'Santiago', 'Sausage', 'Scarborough', 'Sequoia', 'Sonora', 'Stan', 'Stornoway', 'Sycamore', 'Tangerine', 'Tennessee', 'Theodore', 'Toboggan', 'Tomahawk', 'Toronto', 'Tuckahoe', 'Tucan', 'Tucker', 'Victoria', 'Wallace', 'Warren', 'Winnipeg', 'Yucatan', 'Yukon', 'Zelda', 'Ziggy']);
 }
 
 function getPre()
 {
-  return getItem(['Apple', 'Black', 'Broad', 'Bumble', 'Bungle', 'Button', 'Chamber', 'Clamber', 'Copper', 'Cold', 'Corn', 'Crumble', 'Deep', 'Ember', 'Ever', 'Feather', 'Fight', 'Fountain', 'Hammer', 'Hard', 'Hog', 'Horn', 'Humble', 'Iron', 'Jingle', 'Jumble', 'Jump', 'Jungle', 'Gold', 'Golden', 'Good', 'Grumble', 'Long', 'Low', 'Metal', 'Moose', 'Mountain', 'Mouse', 'Mud', 'Night', 'Rumple', 'Power', 'Punch', 'Salty', 'Sandle', 'Scarlet', 'Shackle', 'Small', 'Strong', 'Tender', 'Thorn', 'Thunder', 'Tug', 'Tumble', 'Tough', 'Under', 'Yellow', 'Wooden']);
+  return getItem(['Apple', 'Black', 'Broad', 'Bumble', 'Bungle', 'Button', 'Chamber', 'Clamber', 'Copper', 'Cold', 'Corn', 'Crumble', 'Deep', 'Ember', 'Ever', 'Feather', 'Fight', 'Fountain', 'Hammer', 'Hard', 'Hog', 'Horn', 'Humble', 'Iron', 'Jingle', 'Jumble', 'Jump', 'Jungle', 'Gold', 'Golden', 'Good', 'Grumble', 'Long', 'Low', 'Metal', 'Moose', 'Mountain', 'Mouse', 'Mud', 'Night', 'Rumple', 'Power', 'Punch', 'Salty', 'Sandle', 'Sandy', 'Scarlet', 'Shackle', 'Small', 'Strong', 'Tender', 'Thorn', 'Thunder', 'Tug', 'Tumble', 'Tough', 'Under', 'Yellow', 'Wooden']);
 }
 
 function getSuf()
 {
-  return getItem(['bag', 'bags', 'bake', 'bank', 'basket', 'berries', 'berry', 'bin', 'bird', 'bolt', 'bone', 'bones', 'booth', 'boots', 'bottom', 'brains', 'breath', 'brick', 'bridge', 'buckle', 'buckles', 'buns', 'burger', 'cap', 'castle', 'choke', 'crack', 'cracker', 'crumbs', 'darling', 'fever', 'field', 'finger', 'fingers', 'foal', 'fold', 'foot', 'green', 'grills', 'ham', 'hat', 'hood', 'horn', 'juice', 'law', 'love', 'machine', 'more', 'mouth', 'park', 'parker', 'paw', 'pickle', 'poke', 'puddle', 'seed', 'shade', 'shoes', 'shot', 'shoot', 'smith', 'snout', 'socks', 'stone', 'tack', 'tackle', 'tickets', 'toe', 'toes', 'tubes', 'weed', 'well']);
+  return getItem(['bag', 'bags', 'bake', 'bank', 'basket', 'berries', 'berry', 'bin', 'bird', 'bolt', 'bone', 'bones', 'booth', 'boots', 'bottom', 'brains', 'breath', 'brick', 'bridge', 'buckle', 'buckles', 'buns', 'burger', 'cap', 'castle', 'choke', 'crack', 'cracker', 'crumbs', 'darling', 'fever', 'field', 'finger', 'fingers', 'foal', 'fold', 'foot', 'green', 'grills', 'ham', 'hat', 'hood', 'horn', 'jaw', 'juice', 'law', 'love', 'machine', 'more', 'mouth', 'park', 'parker', 'paw', 'pickle', 'poke', 'puddle', 'seed', 'shade', 'shoes', 'shot', 'shoot', 'smith', 'snout', 'socks', 'stone', 'tack', 'tackle', 'tickets', 'toe', 'toes', 'tubes', 'weed', 'well']);
 }
 
 function getMedial()
