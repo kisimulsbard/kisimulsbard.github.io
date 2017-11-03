@@ -1,25 +1,49 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <title>Searchers of the Unknown / Torchbearer Character Generator</title>
+  <title>Labyrinth Lord Character Creator</title>
  </head>
- <body id='backcolor' style='width:95%' onclick='printCharacter(new character())'>
+ <body id='backcolor' style='width:95%'>
+  <h3 style='text-align:center' onclick='printCharacter(new character())'><u>New</u></h3>
+
+<table style='margin: 0px auto'>
+ <tr>
+  <td>
+   <table style='margin: 0px auto'>
+    <tr>
+     <td>
+
   <h2 style='text-align:center' id='name' ></h2>
   <h3 style='text-align:center' id='title'></h3>
   <h3 style='text-align:center' id='hits'></h3>
   <h3>
-   <table style='margin: 0px auto; border: 2px solid black'>
+   <table style='margin: 0px auto'>
     <tr>
-     <td>HP:</td>
-     <td id='hp'></td>
-     <td>~</td>
-     <td>AC:</td>
-     <td id='ac'></td>
+     <td>
+      <table style='border: 2px solid black'>
+       <tr>
+        <td>HP:</td>
+        <td id='hp'></td>
+       </tr>
+      </table>
+     </td>
+     <td>
+      <table style='border: 2px solid black'>
+       <tr>
+        <td>AC:</td>
+        <td id='ac'></td>
+       </tr>
+      </table>
+     </td>
     </tr>
    </table>
   </h3>
 
   <table style='border: 2px solid black; height: 100%; margin: 0px auto'>
+   <tr>
+     <td style='text-align:center'><b>Stats:</b></td>
+     <td style='text-align:center'><b>Saves:</b></td>
+   </tr>
    <tr>
     <td>
      <table style='border: 2px solid black'>
@@ -84,6 +108,29 @@
 
   <h3 style='text-align:center' id='languages'></h3>
 
+     </td>
+    </tr>
+   </table>
+  </td>
+  <td>
+   <table style='margin: 0px auto'>
+    <tr>
+     <td style='text-align:center'>
+      <b>Inventory:</b>
+     </td>
+    </tr>
+    <tr>
+     <td>
+
+  <table style='border: 2px solid black; margin: 0px auto' id='inv'></table>
+
+     </td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</table>
+
 <script>
 
 printCharacter(new character());
@@ -103,11 +150,11 @@ function character()
   this.class = getClass(this.stats);
   this.mods = getMods(this.stats, this.class);
   this.HP = getHP(this.class, parseInt(this.mods[4]));
-  this.AC = 9 + parseInt(this.mods[1]);
   this.saves = getSaves(this.class);
   this.alignment = getItem(['Lawful', 'Neutral', 'Chaotic']);
   this.languages = getLanguages(this.stats[3], this.class);
-  this.descript = getDescript();
+  this.inventory = getInventory(this.class, this.HP, this.mods[0], this.mods[2]);
+  this.AC = this.inventory[1] + parseInt(this.mods[1]);
 }
 
 
@@ -146,6 +193,41 @@ function printCharacter(joe)
   document.getElementById('wands').innerHTML = joe.saves[3];
   document.getElementById('spells').innerHTML = joe.saves[4];
   document.getElementById('languages').innerHTML = joe.languages;
+  document.getElementById('inv').innerHTML = printInventory(joe.inventory[0]);
+}
+
+
+
+
+
+function printInventory(a)
+{
+  var b = '';
+  var load = 0;
+  for (var i = 0; i < a.hand.length; i++) {
+    b = b.concat('<tr><td>');
+    b = b.concat(a.hand[i][0]);
+    b = b.concat('</td><td>');
+    b = b.concat(a.hand[i][1]);
+    b = b.concat('</td><td>');
+    b = b.concat(a.hand[i][2].toString());
+    b = b.concat(' lbs.</td></tr>');
+    load += a.hand[i][2];
+  }
+  for (var i = 0; i < a.pack.length; i++){
+    b = b.concat('<tr><td> - ');
+    b = b.concat(a.pack[i][0]);
+    b = b.concat('</td><td>');
+    b = b.concat(a.pack[i][1]);
+    b = b.concat('</td><td>');
+    b = b.concat(a.pack[i][2].toString());
+    b = b.concat(' lbs.</td></tr>');
+    load += a.pack[i][2];
+  }
+  b = b.concat('<tr><td>Total Weight:</td><td></td><td>');
+  b = b.concat(load.toString());
+  b = b.concat(' lbs.</td></tr>');
+  return b;
 }
 
 
@@ -166,7 +248,7 @@ function getColor(charClass)
       return 'LightGreen';
     case 'Fighter':
       return 'Cornsilk';
-    case 'Magic User':
+    case 'Magic-User':
       return 'Pink';
     case 'Thief':
       return 'Silver';
@@ -196,7 +278,7 @@ function getClass(a)
   if (a[0] >= 13 && a[3] >= 16) qualify.push('Elf');
   if (a[0] >= 16) qualify.push('Fighter');
   if (a[0] >= 13 && a[1] >= 13 && a[2] >= 9) qualify.push('Halfling');
-  if (a[3] >= 16) qualify.push('Magic User');
+  if (a[3] >= 16) qualify.push('Magic-User');
   if (a[1] >= 16) qualify.push('Thief');
   if (qualify.length > 0) return getItem(qualify);
 
@@ -205,7 +287,7 @@ function getClass(a)
   if (a[0] >= 13 && a[3] >= 13) qualify.push('Elf');
   if (a[0] >= 13) qualify.push('Fighter');
   if ((a[0] >= 13 || a[1] >= 13) && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
-  if (a[3] >= 13) qualify.push('Magic User');
+  if (a[3] >= 13) qualify.push('Magic-User');
   if (a[1] >= 13) qualify.push('Thief');
   if (qualify.length > 0) return getItem(qualify);
 
@@ -214,7 +296,7 @@ function getClass(a)
   if (a[0] >= 9 && a[3] >= 9) qualify.push('Elf');
   if (a[0] >= 9) qualify.push('Fighter');
   if (a[0] >= 9 && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
-  if (a[3] >= 9) qualify.push('Magic User');
+  if (a[3] >= 9) qualify.push('Magic-User');
   if (a[1] >= 9) qualify.push('Thief');
   if (qualify.length > 0) return getItem(qualify);
 
@@ -223,7 +305,7 @@ function getClass(a)
   if (a[0] >= 6 && a[3] >= 9) qualify.push('Elf');
   if (a[0] >= 6) qualify.push('Fighter');
   if (a[0] >= 6 && a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
-  if (a[3] >= 6) qualify.push('Magic User');
+  if (a[3] >= 6) qualify.push('Magic-User');
   if (a[1] >= 6) qualify.push('Thief');
   if (qualify.length > 0) return getItem(qualify);
 
@@ -232,7 +314,7 @@ function getClass(a)
   if (a[3] >= 9) qualify.push('Elf');
   qualify.push('Fighter');
   if (a[1] >= 9 && a[2] >= 9) qualify.push('Halfling');
-  qualify.push('Magic User');
+  qualify.push('Magic-User');
   qualify.push('Thief');
   return getItem(qualify);
 }
@@ -356,7 +438,7 @@ function getHP(charClass, hp)
 {
   switch (charClass)
   {
-    case 'Magic User': case 'Thief':
+    case 'Magic-User': case 'Thief':
       hp += roll(1, 4); break;
     case 'Cleric': case 'Elf': case 'Halfling':
       hp += roll(1, 6); break;
@@ -383,7 +465,7 @@ function getSaves(charClass)
       return [15, 12, 13, 13, 15];
     case 'Fighter':
       return [17, 14, 16, 15, 18];
-    case 'Magic User':
+    case 'Magic-User':
       return [16, 13, 13, 13, 14];
     case 'Thief':
       return [16, 14, 13, 15, 14];
@@ -401,7 +483,7 @@ function getLanguages(int, charClass)
     case 3:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Broken Common, Illiterate';
         case 'Dwarf':
           return 'Speaks Broken Common and Dwarvish, Illiterate';
@@ -413,7 +495,7 @@ function getLanguages(int, charClass)
     case 4: case 5:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Common, Illiterate';
         case 'Dwarf':
           return 'Speaks Common and Dwarvish, Illiterate';
@@ -425,19 +507,19 @@ function getLanguages(int, charClass)
     case 6: case 7: case 8:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
-          return 'Speaks Common, Somewhat Literate';
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
+          return 'Speaks Common, Almost Illiterate';
         case 'Dwarf':
-          return 'Speaks Common and Dwarvish, Somewhat Literate';
+          return 'Speaks Common and Dwarvish, Almost Illiterate';
         case 'Elf':
-          return 'Speaks Common and Elvish, Somewhat Literate';
+          return 'Speaks Common and Elvish, Almost Illiterate';
         case 'Halfling':
-          return 'Speaks Common and Halfling, Somewhat Literate';
+          return 'Speaks Common and Halfling, Almost Illiterate';
       }
     case 9: case 10: case 11: case 12:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Common';
         case 'Dwarf':
           return 'Speaks Common and Dwarvish';
@@ -449,7 +531,7 @@ function getLanguages(int, charClass)
     case 13: case 14: case 15:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Common and ' + pickLang(1, charClass);
         case 'Dwarf':
           return 'Speaks Common, Dwarvish and ' + pickLang(1, charClass);
@@ -461,7 +543,7 @@ function getLanguages(int, charClass)
     case 16: case 17:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Common, ' + pickLang(2, charClass);
         case 'Dwarf':
           return 'Speaks Common, Dwarvish, ' + pickLang(2, charClass);
@@ -473,7 +555,7 @@ function getLanguages(int, charClass)
     case 18:
       switch (charClass)
       {
-        case 'Cleric': case 'Fighter': case 'Magic User': case 'Thief':
+        case 'Cleric': case 'Fighter': case 'Magic-User': case 'Thief':
           return 'Speaks Common, ' + pickLang(3, charClass);
         case 'Dwarf':
           return 'Speaks Common, Dwarvish, ' + pickLang(3, charClass);
@@ -508,7 +590,7 @@ function pickLang(num, charClass)
           a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7, 8, 12]); break;
         case 'Halfling':
           a[i] = getItem([1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 6, 7, 8, 11, 11, 12, 13, 14, 18]); break;
-        case 'Magic User':
+        case 'Magic-User':
           a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 7, 7, 7, 8, 9, 9, 9, 10, 10, 10, 11, 12, 14, 15, 16, 17, 18, 19, 19]); break;
         case 'Thief':
           a[i] = getItem([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 7, 8, 11, 12, 15, 19]);
@@ -586,8 +668,11 @@ function getItem(list)
 
 function getFullName()
 {
+  if (roll(1, 100) === 1) return getUnique();
+  if (roll(1, 30) === 1) return getChiasmus();
   if (roll(1, 3) > 1) return getName() + ' ' + getName();
-  return getName() + getMedial() + getName();
+  if (roll(1, 3) > 1) return getName() + getMedial() + getName();
+  return getTitle() + ' ' + getName();
 }
 
 
@@ -601,17 +686,17 @@ function getName()
 
 function getCompleteName()
 {
-  return getItem(['Aberdeen', 'Abraham', 'Agnes', 'Albatross', 'Antelope',  'Apache', 'Arkansas', 'Artichoke', 'Baltimore', 'Banjo', 'Barneby', 'Buffalo', 'Billy', 'Bob', 'Burgess', 'Cactus', 'Canterbury', 'Caribou', 'Charles', 'Cherokee', 'Chickasaw', 'Chocksaw', 'Cockatoo', 'Conan', 'Cusco', 'Denver', 'Dorris', 'Duncan', 'Durango', 'Eskimo', 'Fandango', 'Finnegan', 'Foothills', 'Fox', 'Francois', 'Geronimo', 'Goose', 'Guadeloupe', 'Hambone', 'Hamilton', 'Hickory', 'Hidalgo', 'Hurricane', 'Idaho', 'Iroquois', 'Irving', 'Jack', 'Jaguar', 'Jane', 'Jebediah', 'Jezebel', 'Jim', 'Jimmy', 'Joe', 'Jones', 'John', 'Johnny', 'Johnson', 'Kenesaw', 'Labrador', 'Lafayette', 'Lehigh', 'Manitoba', 'Marquis', 'Marrakesh', 'McCarthy', 'McCormick', 'Monroe', 'Montezuma', 'Morocco', 'Moses', 'Mountain', 'Mississippi', 'Muhammad', 'Mulligan', 'Obadiah', 'Orlando', 'Panama', 'Patrick', 'Peabody', 'Pumpernickel', 'Ramadan', 'Rococo', 'Sandwich', 'Santiago', 'Sausage', 'Scarborough', 'Sequoia', 'Sonora', 'Stan', 'Stornoway', 'Sycamore', 'Tangerine', 'Tennessee', 'Theodore', 'Toboggan', 'Tomahawk', 'Toronto', 'Tuckahoe', 'Tucan', 'Tucker', 'Victoria', 'Wallace', 'Warren', 'Winnipeg', 'Yucatan', 'Yukon', 'Zelda', 'Ziggy']);
+  return getItem(['Aberdeen', 'Abraham', 'Agnes', 'Albatross', 'Antelope',  'Apache', 'Arkansas', 'Artichoke', 'Baltimore', 'Banjo', 'Barneby', 'Buffalo', 'Billy', 'Bob', 'Buchanan', 'Burgess', 'Cactus', 'Canterbury', 'Caribou', 'Charles', 'Chattanooga', 'Cherokee', 'Chickasaw', 'Chocksaw', 'Cockatoo', 'Conan', 'Cusco', 'Dan', 'Denver', 'Dorris', 'Duck', 'Duncan', 'Durango', 'Eskimo', 'Fandango', 'Finnegan', 'Foothills', 'Fox', 'Francois', 'Geronimo', 'Goose', 'Guadeloupe', 'Hambone', 'Hamilton', 'Hickory', 'Hidalgo', 'Hurricane', 'Idaho', 'Indiana', 'Iroquois', 'Irving', 'Jack', 'Jaguar', 'Jane', 'Jebediah', 'Jenkins', 'Jezebel', 'Jim', 'Jimmy', 'Joe', 'Jones', 'John', 'Johnny', 'Johnson', 'Kenesaw', 'Labrador', 'Lafayette', 'Lehigh', 'Leroy', 'Manitoba', 'Marquis', 'Marrakesh', 'McCarthy', 'McCormick', 'Monroe', 'Montezuma', 'Morocco', 'Moses', 'Mountain', 'Mississippi', 'Muhammad', 'Mulligan', 'Obadiah', 'Orlando', 'Panama', 'Patrick', 'Peabody', 'Piper', 'Potato', 'Pumpernickel', 'Ramadan', 'Rococo', 'Sandwich', 'Santiago', 'Sausage', 'Scarborough', 'Sequoia', 'Sonora', 'Stan', 'Stornoway', 'Sycamore', 'Sunshine', 'Tangerine', 'Tennessee', 'Theodore', 'Thorpe', 'Toboggan', 'Tomahawk', 'Toronto', 'Tuckahoe', 'Tucan', 'Tucker', 'Victoria', 'Wallace', 'Warren', 'Wellington', 'Winnipeg', 'Yucatan', 'Yukon', 'Zelda', 'Ziggy']);
 }
 
 function getPre()
 {
-  return getItem(['Apple', 'Black', 'Broad', 'Bumble', 'Bungle', 'Button', 'Chamber', 'Clamber', 'Copper', 'Cold', 'Corn', 'Crumble', 'Deep', 'Ember', 'Ever', 'Feather', 'Fight', 'Fountain', 'Hammer', 'Hard', 'Hog', 'Horn', 'Humble', 'Iron', 'Jingle', 'Jumble', 'Jump', 'Jungle', 'Gold', 'Golden', 'Good', 'Grumble', 'Long', 'Low', 'Metal', 'Moose', 'Mountain', 'Mouse', 'Mud', 'Night', 'Rumple', 'Power', 'Punch', 'Salty', 'Sandle', 'Sandy', 'Scarlet', 'Shackle', 'Small', 'Strong', 'Tender', 'Thorn', 'Thunder', 'Tug', 'Tumble', 'Tough', 'Under', 'Yellow', 'Wooden']);
+  return getItem(['Amber', 'Apple', 'Black', 'Broad', 'Bumble', 'Bungle', 'Button', 'Chamber', 'Clamber', 'Copper', 'Cold', 'Corn', 'Cough', 'Crumble', 'Deep', 'Down', 'Elder', 'Ember', 'Ever', 'Feather', 'Fight', 'Fountain', 'Hammer', 'Hard', 'Hog', 'Horn', 'Humble', 'Iron', 'Jingle', 'Jumble', 'Jump', 'Jungle', 'Gold', 'Golden', 'Good', 'Grumble', 'Long', 'Low', 'Metal', 'Moose', 'Mountain', 'Mouse', 'Mud', 'Night', 'Rumple', 'Potato', 'Power', 'Punch', 'Push', 'Salty', 'Sandle', 'Sandy', 'Scarlet', 'Shackle', 'Small', 'Stone', 'Strong', 'Tender', 'Thorn', 'Thunder', 'Tug', 'Tumble', 'Tough', 'Under', 'Yellow', 'Wooden']);
 }
 
 function getSuf()
 {
-  return getItem(['bag', 'bags', 'bake', 'bank', 'basket', 'berries', 'berry', 'bin', 'bird', 'bolt', 'bone', 'bones', 'booth', 'boots', 'bottom', 'brains', 'breath', 'brick', 'bridge', 'buckle', 'buckles', 'buns', 'burger', 'cap', 'castle', 'choke', 'crack', 'cracker', 'crumbs', 'darling', 'fever', 'field', 'finger', 'fingers', 'foal', 'fold', 'foot', 'green', 'grills', 'ham', 'hat', 'hood', 'horn', 'jaw', 'juice', 'law', 'love', 'machine', 'more', 'mouth', 'park', 'parker', 'paw', 'pickle', 'poke', 'puddle', 'seed', 'shade', 'shoes', 'shot', 'shoot', 'smith', 'snout', 'socks', 'stone', 'tack', 'tackle', 'tickets', 'toe', 'toes', 'tubes', 'weed', 'well']);
+  return getItem(['bag', 'bags', 'bake', 'bank', 'basket', 'berries', 'berry', 'bin', 'bird', 'biscuit', 'bloom', 'bolt', 'bone', 'bones', 'booth', 'boots', 'bottom', 'brains', 'breath', 'brick', 'bridge', 'buckle', 'buckles', 'buns', 'burger', 'cap', 'castle', 'choke', 'crack', 'cracker', 'crumbs', 'darling', 'face', 'feet', 'fever', 'field', 'finger', 'fingers', 'foal', 'fold', 'folds', 'foot', 'green', 'grills', 'ham', 'hat', 'hood', 'horn', 'jaw', 'juice', 'law', 'love', 'machine', 'more', 'mouth', 'park', 'parker', 'paw', 'pepper', 'pickle', 'poke', 'puddle', 'seed', 'shade', 'shoes', 'shot', 'shoot', 'smith', 'snout', 'socks', 'stone', 'tack', 'tackle', 'tickets', 'toe', 'toes', 'tubes', 'weed', 'well']);
 }
 
 function getMedial()
@@ -619,115 +704,176 @@ function getMedial()
   return getItem([' von ', ' Mc', ' St. ', ' ' + getName() + ' ', ' ' + getName() + '-', ' \"' + getName() + '\" ']);
 }
 
-
-
-
-
-function getDescript()
+function getTitle()
 {
-  return (getItem([getOccupation() + ', ']) + 
-          getItem(['', '', getHair() + ', ']) + 
-          getItem(['', '', getFace() + ', ']) + 
-          getItem(['', '', getBody() + ', ']) + 
-          getItem(['', '', getAccessory() + ', ']) + 
-          getItem(['', '', getTrait() + ', ']) + 
-          getItem(['', '', getPassion() + ', ']) + 
-          getItem(['', '', getIrritation() + ', ']) + 
-          getItem(['', '', getMotivation() + ', ']) + 
-          getItem(['', '', getHobby() + ', ']) + 
-          getItem(['', getSkill() + ', '])).slice(0, -2);
+  return getItem(['Old Man', 'Misses', 'Mister', 'Señor']);
+}
+
+function getUnique()
+{
+  return getItem(['Amanda Bynes', 'Arnold Schwarzeneggar', 'Bill Murray', 'Bugs Bunny', 'Charlie Sheen', 'Conan O\'Brien', 'Daniel Radcliffe', 'Danny DeVito', 'Davy Crockett', 'Don Knotts', 'Dora the Explorer', 'Dr. Zoidberg', 'Dwayne \"the Rock\" Johnson', 'George Clooney', 'Hiro Protagonist', 'Hugh Jackman', 'James Franco', 'Jennifer Lawrence', 'J. D. Salinger', 'John C. Reilly', 'John Malkovich', 'Kanye West', 'Kareem Abdul-Jabbar', 'Kermit the Frog', 'Matt Damon', 'Mike Tyson', 'Niel Patrick Harris', 'Pikachu', 'Rick Moranis', 'Shia LeBeouf', 'Seth Rogan', 'Steve Urkel', 'Tina Fey']);
+}
+
+function getChiasmus()
+{
+  var a = preSuf();
+  var b = preSuf();
+  if (roll(1, 3) > 1) return cap(a) + b + ' ' + cap(b) + a;
+  return cap(a) + b + ' ' + cap(b) + a + 's';
+}
+
+function preSuf()
+{
+  return getItem(['buckle', 'bumble', 'bungle', 'burger', 'bottom', 'button', 'chamber', 'fever', 'finger', 'fountain', 'hammer', 'jungle', 'meister', 'mountain', 'parker', 'pepper', 'puddle', 'shackle', 'tackle', 'tender', 'thunder', 'ticket']);
+}
+
+function cap(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 
 
 
 
-function getOccupation()
+function inv()
 {
-  return getItem(['alchemist', 'animal trainer', 'armorer', 'astrologer', 'blacksmith', 'caravan guard', 'cobbler', 'confidence artist', 'cooper', 'caturse', 'ditch digger', 'dwarven blacksmith', 'dwarven herder', 'dwarven miner', 'elven artisan', 'elven forester', 'elven sage', 'farmer', 'fortune-teller', 'gambler', 'gongfarmer', 'grave digger', 'guild beggar', 'halfling trader', 'halfling vagabond', 'halfling vagrant', 'healer', 'herbalist', 'herder', 'hunter', 'indentured servant', 'jester', 'jeweler', 'locksmith', 'mercenary', 'miller', 'baker', 'minstrel', 'noble', 'orphan', 'ostler', 'outlaw', 'scribe', 'shaman', 'slave', 'smuggler', 'soldier', 'squire', 'trapper', 'urchin', 'wainwright', 'weaver', 'wizard\'s apprentice', 'woodcutter']);
+  this.gold = 10 * roll(3, 8);
+  this.pack = [];
+  this.hand = ['gold'];
+  this.buy = function (num, item, cost, pack)
+  {
+    if (num === 0) return false;
+    if (cost * num > this.gold) 
+    {
+      return this.buy (num - 1, item, cost);
+    }
+    if (num > 1) {
+      var a =
+      [
+        item[0] + '(' + num + ')',
+        item[1], item[2] * num
+      ];
+    } else {
+      var a = item;
+    }
+    if (pack) {
+      this.pack.push(a);
+    } else {
+      this.hand.push(a);
+    }
+    this.gold -= cost * num;
+    return true;
+  }
 }
 
-
-
-
-function getHair()
+function getInventory(cla, hp, hit, missle)
 {
-  return getItem(['', '', 'curly', 'long', 'short']) + ' ' + getItem(['black', 'blond', 'brown', 'red']) + ' hair';
+  var a = new inv();
+  var gotPack = (roll(1, 8) > 1);
+  var ac = 9;
+
+  if (gotPack) a.gold -= 2;
+
+  if (cla === 'Cleric' && roll(1, 5) > 1) {
+    if (roll(1, 3) > 1) {
+      a.buy(1, ['Holy symbol, wooden', '', 0], 1, false);
+    } else {
+      a.buy(1, ['Holy symbol, silver', '', 1], 25, false);
+    }
+  }
+
+  if (cla === 'Magic-User' && roll(1, 5) > 1)
+    a.buy(1, ['Spell book', '', 3], 15, gotPack);
+
+  if (cla === 'Thief' && roll(1, 5) > 1)
+    a.buy(1, ['Thieves\' tools', '', 1], 30, gotPack);
+
+
+
+  if (roll(1, 5) > 1)
+    a.buy(1, ['Bedroll', '', 2], 2, gotPack);
+
+
+
+  if (gotPack && cla === 'Halfling') {
+    a.buy(roll(2, 10), ['Trail Rations',  '', 1], .1, gotPack);
+  } else if (gotPack && roll(1, 5) > 1) {
+    a.buy(roll(2, 5), ['Trail Rations',  '', 1], .1, gotPack);
+  }
+
+
+
+  if (gotPack && roll(1, 3) > 1)
+    a.buy(roll(2, 4), ['Torches', '', 1], .04, gotPack);
+
+
+
+  if (hp === 1 && cla !== 'Magic-User' && cla !== 'Thief' && roll(1, 4) === 1)
+  {
+    a.buy(1, ['Chain Mail Armor', '5 AC', 30], 70, false);
+    ac = 5;
+  } else if (hp === 1 && cla !== 'Magic-User' && cla !== 'Thief' && roll(1, 3) > 1)
+  {
+    if (!a.buy(1, ['Studded Leather Armor', '7 AC', 20], 30, false))
+    {
+      if (a.gold >= 6)
+      {
+        if (roll(1, 2) == 1)
+        {
+          a.buy(1, ['Leather Armor', '8 AC', 15], 6, false);
+        } else
+        {
+          a.buy(1, ['Padded Armor', '8 AC', 10], 4, false);
+        }
+        ac = 8;
+      }
+    } else { ac = 7; }
+  } else if (cla === 'Thief' && roll(1, 2) > 1)
+  {
+    if (a.gold >= 6)
+    {
+      if (roll(1, 2) == 1)
+      {
+        a.buy(1, ['Leather Armor', '8 AC', 15], 6, false);
+      } else
+      {
+        a.buy(1, ['Padded Armor', '8 AC', 10], 4, false);
+      }
+      ac = 8;
+    }
+  } else if (cla !== 'Magic-User' && cla !== 'Thief' && roll(1, 3) === 1)
+  {
+    if (roll(1, 6) === 1)
+    {
+      if (a.buy(1, ['Chain Mail Armor', '5 AC', 30], 70, false))
+        ac = 5;
+    } else if (roll(1, 3) == 1)
+    {
+      if (a.buy(1, ['Studded Leather Armor', '7 AC', 20], 30, false))
+        ac = 7;
+    } else
+    {
+      if (a.gold >= 6)
+      {
+        if (roll(1, 2) == 1)
+        {
+          a.buy(1, ['Leather Armor', '8 AC', 15], 6, false);
+        } else
+        {
+          a.buy(1, ['Padded Armor', '8 AC', 10], 4, false);
+        }
+        ac = 8;
+      }
+    }
+  }
+
+  
+  if (gotPack)
+    a.buy(1, ['Backpack', '', 2], 0, false);
+  a.hand[0] = ['gold(' + Math.floor(a.gold) + ')', '', Math.floor(a.gold / 15)];
+  return [a, ac];
 }
-
-
-
-
-function getFace()
-{
-  return getItem(['blue eyes', 'enormous moustache', 'large nose', 'pale', 'small nose', 'tan', 'thick beard', 'yellow eyes']);
-}
-
-
-
-
-function getBody()
-{
-  return getItem(['elderly', 'muscular', 'short', 'stout', 'tall', 'youthful']);
-}
-
-
-
-
-function getAccessory()
-{
-  return getItem(['uses a walking stick', 'wears a flower garland', 'wears a headscarf', 'wears a pointy hat', 'wears a turban', 'wears sandals']);
-}
-
-
-
-
-function getTrait()
-{
-  return getItem(['accommodating', 'aggressive', 'ambitious', 'annoying', 'awkward', 'brave', 'calm', 'charming', 'clean', 'cold', 'complacent', 'creative', 'crude', 'cynical', 'daring', 'depressed', 'doubtful', 'eccentric', 'flirty', 'funny', 'graceful', 'honest', 'impulsive', 'independent', 'insecure', 'lazy', 'loving', 'loyal', 'musical', 'naive', 'nosy', 'optimistic', 'outspoken', 'pessimistic', 'pious', 'proud', 'quiet', 'sleazy', 'superstitious', 'sweet', 'vindictive', 'worldly']);
-}
-
-
-
-
-function getPassion()
-{
-  return getItem(['enjoys complaining', 'enjoys cruelty', 'enjoys fancy parties', 'enjoys flattery', 'enjoys loud parties', 'enjoys obscure facts', 'enjoys the little things', 'loves small animals']);
-}
-
-
-
-
-function getIrritation()
-{
-  return getItem(['annoyed by ', 'disgusted by ', 'put off by ']) + getItem(['bureaucracy', 'complaining', 'cruelty', 'fancy parties', 'foolish bravery', 'flattery', 'obscure facts', 'loud parties', 'small animals', 'vagabonds', 'zealots']);
-}
-
-
-
-
-function getMotivation()
-{
-  return getItem(['driven by curiosity', 'driven by hate', 'fights for honor', 'hungry for power', 'seeks true love', 'strives for justice']);
-}
-
-
-
-
-function getHobby()
-{
-  return getItem(['cooks', 'dances', 'drinks in excess', 'gambles', 'plays the ' + getItem(['fiddle', 'flute', 'lute']), 'sings', 'writes poetry']);
-}
-
-
-
-
-
-function getSkill()
-{
-  return getItem(['ear for languages', 'good with animals', 'can speak with ' + getItem(['creatures of the forest', 'dragonkin', 'goblinoids', 'the undead']), 'silver tongue']);
-}
-
 
 
 </script>
